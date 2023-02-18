@@ -35,4 +35,16 @@ public class Medico {
         this.crm = dados.crm();
         this.endereco = new Endereco(dados.endereco());
     }
+
+    public void atualizarInformacoes(DadosAtualizarMedicos dados) {
+        if (dados.nome() != null){
+            this.nome = dados.nome();
+        }
+        if (dados.endereco() != null){
+            this.telefone = dados.telefone();
+        }
+        if (dados.endereco() != null){
+            this.endereco.atualizarInformacoes(dados.endereco());
+        }
+    }
 }
