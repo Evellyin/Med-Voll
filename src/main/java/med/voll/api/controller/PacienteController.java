@@ -1,10 +1,7 @@
 package med.voll.api.controller;
 
 import jakarta.validation.Valid;
-import med.voll.api.paciente.DadosCadastroPaciente;
-import med.voll.api.paciente.DadosListagemPaciente;
-import med.voll.api.paciente.Paciente;
-import med.voll.api.paciente.PacienteReposity;
+import med.voll.api.paciente.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -21,13 +18,19 @@ public class PacienteController {
 
     @PostMapping
     @Transactional
-    @Valid
-    public void cadastrar (@RequestBody DadosCadastroPaciente dados){
+    public void cadastrar (@Valid @RequestBody DadosCadastroPaciente dados){
         reposity.save(new Paciente(dados));
     }
 
     @GetMapping
     public Page<DadosListagemPaciente> listar (@PageableDefault (size = 10, sort = {"nome"}) Pageable paginacao) {
         return reposity.findAll(paginacao).map(DadosListagemPaciente::new);
+    }
+
+    @PutMapping
+    @Transactional
+    public void atualizar (@Valid @RequestBody DadosAtualizarPaciente dados) {
+        var paciente = reposity.getReferenceById(dados.id());
+        paciente.atualizarInformacoes(dados);
     }
 }
