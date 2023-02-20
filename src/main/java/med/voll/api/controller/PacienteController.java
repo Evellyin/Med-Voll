@@ -9,6 +9,7 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.util.UriComponentsBuilder;
 
 @RestController
 @RequestMapping("/pacientes")
@@ -19,13 +20,18 @@ public class PacienteController {
 
     @PostMapping
     @Transactional
-    public void cadastrar (@Valid @RequestBody DadosCadastroPaciente dados){
-        reposity.save(new Paciente(dados));
+    public ResponseEntity cadastrar (@Valid @RequestBody DadosCadastroPaciente dados, UriComponentsBuilder uriBuilder){
+        var paciente = new Paciente(dados);
+        reposity.save(paciente);
+
+        var uri = uriBuilder.path("/pacientes/{id}").buildAndExpand(paciente.getId()).toUri();
+        return ResponseEntity.created(uri).body((new DadosDetalhamentoPaciente(paciente)));
     }
 
     @GetMapping
-    public Page<DadosListagemPaciente> listar (@PageableDefault (size = 10, sort = {"nome"}) Pageable paginacao) {
-        return reposity.findAllByAtivoTrue(paginacao).map(DadosListagemPaciente::new);
+    public ResponseEntity<Page<DadosListagemPaciente>> listar (@PageableDefault (size = 10, sort = {"nome"}) Pageable paginacao) {
+        var page = reposity.findAllByAtivoTrue(paginacao).map(DadosListagemPaciente::new);
+        return ResponseEntity.ok(page);
     }
 
     @PutMapping
