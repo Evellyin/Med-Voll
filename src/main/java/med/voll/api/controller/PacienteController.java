@@ -33,6 +33,12 @@ public class PacienteController {
         var page = reposity.findAllByAtivoTrue(paginacao).map(DadosListagemPaciente::new);
         return ResponseEntity.ok(page);
     }
+    @GetMapping ("/{id}")
+    public ResponseEntity detalhamento (@PathVariable Long id) {
+        var paciente = reposity.getReferenceById(id);
+
+        return ResponseEntity.ok(paciente);
+    }
 
     @PutMapping
     @Transactional
