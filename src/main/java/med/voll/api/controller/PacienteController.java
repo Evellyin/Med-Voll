@@ -16,34 +16,34 @@ import org.springframework.web.util.UriComponentsBuilder;
 public class PacienteController {
 
     @Autowired
-    private PacienteReposity reposity;
+    private PacienteReposity repository;
 
     @PostMapping
     @Transactional
-    public ResponseEntity cadastrar (@Valid @RequestBody DadosCadastroPaciente dados, UriComponentsBuilder uriBuilder){
+    public ResponseEntity cadastrar(@RequestBody @Valid DadosCadastroPaciente dados, UriComponentsBuilder uriBuilder) {
         var paciente = new Paciente(dados);
-        reposity.save(paciente);
+        repository.save(paciente);
 
         var uri = uriBuilder.path("/pacientes/{id}").buildAndExpand(paciente.getId()).toUri();
-        return ResponseEntity.created(uri).body((new DadosDetalhamentoPaciente(paciente)));
+        return ResponseEntity.created(uri).body(new DadosDetalhamentoPaciente(paciente));
     }
 
     @GetMapping
     public ResponseEntity<Page<DadosListagemPaciente>> listar (@PageableDefault (size = 10, sort = {"nome"}) Pageable paginacao) {
-        var page = reposity.findAllByAtivoTrue(paginacao).map(DadosListagemPaciente::new);
+        var page = repository.findAllByAtivoTrue(paginacao).map(DadosListagemPaciente::new);
         return ResponseEntity.ok(page);
     }
     @GetMapping ("/{id}")
     public ResponseEntity detalhamento (@PathVariable Long id) {
-        var paciente = reposity.getReferenceById(id);
+        var paciente = repository.getReferenceById(id);
 
-        return ResponseEntity.ok(paciente);
+        return ResponseEntity.ok(new DadosDetalhamentoPaciente(paciente));
     }
 
     @PutMapping
     @Transactional
     public ResponseEntity atualizar (@Valid @RequestBody DadosAtualizarPaciente dados) {
-        var paciente = reposity.getReferenceById(dados.id());
+        var paciente = repository.getReferenceById(dados.id());
         paciente.atualizarInformacoes(dados);
 
         return ResponseEntity.ok(new DadosDetalhamentoPaciente(paciente));
@@ -52,7 +52,7 @@ public class PacienteController {
     @DeleteMapping ("/{id}")
     @Transactional
     public ResponseEntity excluir (@PathVariable Long id) {
-        var paciente = reposity.getReferenceById(id);
+        var paciente = repository.getReferenceById(id);
         paciente.excluir();
 
         return ResponseEntity.noContent().build();
