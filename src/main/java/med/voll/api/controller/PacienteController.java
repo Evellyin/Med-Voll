@@ -30,9 +30,11 @@ public class PacienteController {
 
     @PutMapping
     @Transactional
-    public void atualizar (@Valid @RequestBody DadosAtualizarPaciente dados) {
+    public ResponseEntity atualizar (@Valid @RequestBody DadosAtualizarPaciente dados) {
         var paciente = reposity.getReferenceById(dados.id());
         paciente.atualizarInformacoes(dados);
+
+        return ResponseEntity.ok(new DadosDetalhamentoPaciente(paciente));
     }
 
     @DeleteMapping ("/{id}")
