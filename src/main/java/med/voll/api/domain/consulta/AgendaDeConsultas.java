@@ -31,7 +31,7 @@ public class AgendaDeConsultas {
             throw new ValidacaoException("Id do medico não existente.");
         }
 
-        var paciente = pacienteReposity.findById(dados.idPaciente()).get();
+        var paciente = pacienteReposity.getReferenceById(dados.idPaciente());
         var medico = escolherMedico(dados);
         var consulta = new Consulta(null, medico, paciente, dados.data());
 
@@ -40,7 +40,13 @@ public class AgendaDeConsultas {
 
     private Medico escolherMedico(DadosAgendamentoConsulta dados) {
 
-
+        if (dados.idMedico() != null ){
+            return medicoRepository.getReferenceById(dados.idMedico());
+        }
+        if (dados.especialidade() == null){
+            throw new ValidacaoException("Especialidade é obrigatória quando médico não for escolhido.");
+        }
+        return medicoRepository.escolherMedicoAleatorioLivreNaData(dados.especialidade(), dados.data());
     }
 
 }
